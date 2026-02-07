@@ -18,8 +18,11 @@ public class AnalyzerController {
     @PostMapping("/analyze")
     public String analyzeProject(@RequestBody String repoUrl) {
 
-        // 🔴 Step 1: Validate GitHub repository URL format
-        if (repoUrl == null || !repoUrl.matches("^https://github.com/[^/]+/[^/]+/?$")) {
+        // Step 1: Fetch README (validation + normalization handled inside service)
+        String readme = gitHubService.fetchReadme(repoUrl);
+
+        // ❌ Invalid GitHub URL
+        if ("INVALID_URL".equals(readme)) {
             return """
 ❌ **Invalid GitHub Repository URL**
 
@@ -28,16 +31,13 @@ The URL provided is **not a valid GitHub repository link**.
 ✅ Please use the following format:
 https://github.com/username/repository
 
-⚠️ Example:
+📌 Example:
 https://github.com/spring-projects/spring-boot
 """;
         }
 
-        // 🔴 Step 2: Fetch README from GitHub
-        String readme = gitHubService.fetchReadme(repoUrl);
-
         // ❌ README missing or repository inaccessible
-        if (readme == null) {
+        if ("README_NOT_FOUND".equals(readme)) {
             return """
 ❌ **README.md Not Found**
 
@@ -49,7 +49,7 @@ or the repository could not be accessed.
 ✅ Please ensure:
 - The repository exists
 - It is public
-- It contains a well-structured README.md
+- A README.md file is present in the root directory
 """;
         }
 
@@ -58,20 +58,20 @@ or the repository could not be accessed.
             return """
 ⚠️ **Weak README Detected**
 
-A README.md file was found, but it appears to be **too short or incomplete**.
+A README.md file was found, but it appears to be **too short or insufficiently detailed**.
 
 ⚠️ The analysis may be **generic or partially inaccurate**.
 
-💡 For best results, include:
-- Project overview
-- Tech stack
+💡 For best results, consider adding:
+- Clear project overview
+- Tech stack used
 - Architecture or workflow
 - Features
-- Improvements
+- Possible improvements
 """;
         }
 
-        // ✅ Step 3: Safe to analyze with LLM
+        // ✅ Step 2: Safe to analyze using LLM
         return llmService.analyzeProject(readme);
     }
 }
