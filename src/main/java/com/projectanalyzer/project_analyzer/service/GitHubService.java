@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Base64;
 
 @Service
-public class GitHubService {
+public class GitHubService implements RepositoryService {
 
     private static final int MIN_README_LENGTH = 200;
 

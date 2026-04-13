@@ -1,221 +1,343 @@
-🚀 GitHub Project Analyzer
+# 🚀 Project Analyzer
 
-GitHub Project Analyzer is a Spring Boot–based AI application that analyzes GitHub README.md files and generates structured, interview-friendly project insights.
+**Project Analyzer** is a **Spring Boot–based AI application** that analyzes repository `README.md` files and generates **structured, interview-friendly project insights**.
 
-It is primarily designed to help students revise and confidently explain their projects during interviews, while also being useful for developers who want to quickly understand unfamiliar repositories without diving into the entire codebase.
+It helps **students and developers** quickly understand, revise, and confidently explain projects without diving deep into the entire codebase.
 
-🎯 Motivation
+---
 
-Students and developers often build projects for learning, coursework, resumes, or professional growth.
-Over time, remembering design decisions, architecture, and features—especially before interviews—becomes challenging.
+## 🎯 Motivation
 
-Manually revisiting code and documentation can be time-consuming and inefficient.
+Students and developers often build projects for:
 
-This project addresses that problem by:
+* Learning
+* Coursework
+* Resume building
+* Professional growth
 
-Using the project’s README.md as the single source of truth
+Over time, remembering:
 
-Generating a clear, structured explanation using AI
+* Design decisions
+* Architecture
+* Features
 
-Ensuring responses are accurate, responsible, and non-hallucinated
+becomes difficult — especially before interviews.
 
-🧠 How It Works
+Manually revisiting code is:
 
-The user enters a GitHub repository URL
+* ⏱️ Time-consuming
+* 😓 Inefficient
 
-The backend fetches the latest README.md from GitHub using the GitHub REST API
+### ✅ Solution
 
-The README is validated for:
+This project solves that by:
 
-Correct GitHub URL format
+* Using `README.md` as the **single source of truth**
+* Generating **structured explanations using AI**
+* Ensuring **accurate, non-hallucinated output**
 
-Repository accessibility
+---
 
-Presence of README.md
+## 🧠 How It Works
 
-Documentation sufficiency
+```
+User Input (Repo URL)
+        ↓
+Controller
+        ↓
+Repository Service (GitHub / GitLab)
+        ↓
+Fetch README.md
+        ↓
+LLM (LLaMA 3.1 via Groq)
+        ↓
+Structured Analysis
+        ↓
+User Interface
+```
 
-The validated README is sent to a Large Language Model (LLM) for analysis
+### 🔄 Flow Explanation
 
-The user receives a well-structured, interview-ready explanation in the browser
+1. User enters a repository URL
+2. Backend detects platform (**GitHub / GitLab**)
+3. README is fetched using respective APIs
+4. Validation is performed:
 
-The README is fetched dynamically on every request, so any updates to the README are reflected immediately without redeployment.
+   * URL correctness
+   * Repository accessibility
+   * README presence
+   * Documentation quality
+5. README is sent to **LLM for analysis**
+6. Structured output is displayed
 
-✨ Key Features
+---
 
-🔍 README-based analysis only (no assumptions beyond documentation)
+## ✨ Key Features
 
-⚠️ Clear user feedback for:
+### 🔍 Core Functionality
 
-Invalid GitHub repository URLs
+* README-based analysis (no assumptions)
+* Multi-platform support:
 
-Missing README.md files
+  * ✅ GitHub
+  * ✅ GitLab
+  * 🔜 Bitbucket (planned)
 
-Weak or insufficient documentation
+---
 
-🧩 Structured output, including:
+### ⚠️ Smart Validation
 
-Project overview
+* Invalid repository URL detection
+* Missing README detection
+* Weak documentation detection
 
-Key features
+---
 
-Tech stack
+### 🧩 Structured Output
 
-Architecture / design approach
+* Project Overview
+* Key Features
+* Tech Stack
+* Architecture / Flow
+* Interview Explanation
+* Improvements
+* README Quality Score
+* Missing Documentation Sections
 
-Interview explanation
+---
 
-Possible improvements
+### 🧠 Responsible AI Usage
 
-🤝 Friendly, neutral tone with highlighted key points
+* No hallucination
+* Explicit handling of missing data
+* Clear and honest responses
 
-🧠 Responsible AI usage
+---
 
-Hallucination prevention
+### 🎨 User Experience
 
-Explicit mention of missing information
+* Markdown rendering
+* Dark mode 🌙
+* Copy-to-clipboard 📋
+* Loading indicators ⏳
 
-🎨 User-friendly UI
+---
 
-Markdown rendering
+## 🎓 Who Is This For?
 
-Dark mode
+### 👨‍🎓 Students
 
-Copy-to-clipboard
+* Revise projects quickly
+* Prepare for interviews & viva
+* Learn structured explanation
 
-Loading indicators
+---
 
-🎓 Who Is This For?
+### 👨‍💻 Developers
 
-Students
+* Understand unfamiliar repositories
+* Evaluate documentation quality
+* Get quick technical summaries
 
-Revising academic, mini, or final-year projects
+---
 
-Preparing for technical interviews and viva voce
+## 🛠️ Tech Stack
 
-Understanding how to explain projects clearly and confidently
+### Backend
 
-Developers
+* **Java** – Core programming language
+* **Spring Boot** – Backend framework for REST APIs
+* **REST APIs** – Communication layer
+* **Maven** – Build and dependency management
 
-Quickly understanding unfamiliar GitHub repositories
+---
 
-Reviewing documentation quality
+### Frontend
 
-Getting a high-level technical overview without reading all the code
+* **HTML** – Structure
+* **CSS** – Styling
+* **JavaScript** – Interactivity
+* **Marked.js** – Markdown rendering
 
-🛠️ Tech Stack
-Backend
+---
 
-Java
+### AI & APIs
 
-Spring Boot
+* **Groq API** – LLM inference platform
+* **LLaMA 3.1 (8B)** – AI model for analysis
+* **GitHub REST API** – Fetch README
+* **GitLab API** – Fetch README using project ID
 
-REST APIs
+---
 
-Maven
+## 🏗️ Architecture
 
-Frontend
+### 🔹 Design Pattern
 
-HTML
+The application follows a **modular service-based architecture**:
 
-CSS
+```
+Controller
+   ↓
+RepositoryService (Interface)
+   ↓
+ ├── GitHubService
+ ├── GitLabService
+ └── (Future: BitbucketService)
+   ↓
+LLMService
+```
 
-JavaScript
+### 🔹 Key Design Decisions
 
-Markdown Rendering
+* **Abstraction Layer** using `RepositoryService`
+* **Platform-independent logic**
+* Easy extensibility for new platforms
+* Clean separation of concerns
 
-AI & APIs
+---
 
-Groq API (Inference platform)
+## ⚙️ Installation & Setup
 
-LLaMA 3.1 (8B) – Open-source LLM by Meta
+### 🔹 Prerequisites
 
-GitHub REST API (for README fetching)
+* Java 17+
+* Maven
+* Git
 
-🌍 Platform Support
+---
 
-✅ Currently supported: GitHub (public repositories)
+### 🔹 Clone the Repository
 
-🔮 Planned: GitLab and Bitbucket support in the future
+```
+git clone https://github.com/your-username/project-analyzer.git
+cd project-analyzer
+```
 
-The application is intentionally GitHub-focused for now due to GitHub’s public APIs and widespread adoption.
-The architecture is modular and designed to support additional Git platforms without changes to the core analysis logic.
+---
 
-🚀 Deployment Status
+### 🔹 Configure Environment Variables
 
-🚧 Deployment Planned
+#### Windows (PowerShell):
 
-The application is designed to be deployed on Render
+```
+setx GROQ_API_KEY "your_api_key"
+```
 
-Secrets (API keys) are externalized using environment variables
+#### Linux / Mac:
 
-Once deployed, the README will be updated with the live application URL
+```
+export GROQ_API_KEY=your_api_key
+```
 
-README updates in analyzed repositories do not require redeployment.
+---
 
-📌 Usage Instructions
+### 🔹 Application Configuration
 
-Open the GitHub Project Analyzer web interface
+`application.properties`
 
-Paste a valid GitHub repository URL
-Example:
+```
+groq.api.key=${GROQ_API_KEY}
+```
 
-https://github.com/username/repository
+---
 
+### 🔹 Run the Application
 
-Click Analyze
+```
+mvn spring-boot:run
+```
 
-View the structured project analysis instantly
+---
 
-⚠️ Important Notes
+### 🔹 Access the App
 
-Only public GitHub repositories are supported
+```
+http://localhost:8080
+```
 
-A README.md file must be present
+---
 
-For best results, the README should include:
+## 📌 Usage
 
-Project overview / purpose
+1. Open the web interface
+2. Enter repository URL:
 
-Tech stack
+```
+https://github.com/username/repo
+OR
+https://gitlab.com/username/repo
+```
 
-Architecture or workflow
+3. Click **Analyze**
+4. View structured output
 
-Features
+---
 
-Possible improvements
+## ⚠️ Important Notes
 
-If documentation is missing or insufficient, the application will warn the user instead of generating misleading output.
+* Only **public repositories** are supported
+* `README.md` must be present
+* Better documentation → better analysis
 
-🔮 Future Enhancements
+---
 
-Support for GitLab and Bitbucket repositories
+## 🔮 Future Enhancements
 
-README quality scoring
+* Bitbucket integration
+* Private repository support (authentication)
+* Caching for faster responses
+* Advanced README scoring
+* Chatbot for interactive Q&A
+* Deployment monitoring
 
-Detection of missing documentation sections
+---
 
-Cached analysis for repeated requests
+## 🚀 Deployment
 
-Authentication for private repositories
+* Designed for deployment on **Render**
+* Uses **environment variables for secrets**
+* Supports containerization via Docker
 
-Production-grade deployment with monitoring
+---
 
-📄 License & Usage
+## 🔐 Security
 
-This project is intended for learning, demonstration, and portfolio purposes.
-It is hosted using free-tier services, so occasional cold starts or rate limits may occur.
+* API keys are **NOT stored in code**
+* Uses **environment variables**
+* Prevents secret exposure
 
-🙌 Final Note
+---
 
-GitHub Project Analyzer is built with a focus on:
+## 📄 License
 
-Clean architecture
+This project is for:
 
-User clarity
+* Learning
+* Demonstration
+* Portfolio use
 
-Responsible AI usage
+---
 
-Real-world engineering practices
+## 🙌 Final Note
 
-It is designed to evolve over time while remaining honest, useful, and especially helpful for students, without limiting its usefulness for developers.
+This project focuses on:
+
+* Clean architecture
+* User clarity
+* Responsible AI usage
+* Real-world engineering practices
+
+It is designed to help **students succeed in interviews** while also being useful for developers.
+
+---
+
+## ⭐ Support
+
+If you found this helpful:
+
+* ⭐ Star the repository
+* 🍴 Fork it
+* 🛠️ Contribute
+
+---

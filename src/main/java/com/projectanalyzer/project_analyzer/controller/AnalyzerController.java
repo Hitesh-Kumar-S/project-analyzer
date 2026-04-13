@@ -1,6 +1,7 @@
 package com.projectanalyzer.project_analyzer.controller;
 
 import com.projectanalyzer.project_analyzer.service.GitHubService;
+import com.projectanalyzer.project_analyzer.service.GitLabService;
 import com.projectanalyzer.project_analyzer.service.LLMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,65 +14,82 @@ public class AnalyzerController {
     private GitHubService gitHubService;
 
     @Autowired
+    private GitLabService gitLabService;
+
+    @Autowired
     private LLMService llmService;
 
     @PostMapping("/analyze")
     public String analyzeProject(@RequestBody String repoUrl) {
 
-        // Step 1: Fetch README (validation + normalization handled inside service)
-        String readme = gitHubService.fetchReadme(repoUrl);
+        String readme;
 
-        // ❌ Invalid GitHub URL
-        if ("INVALID_URL".equals(readme)) {
+        // 🔥 Platform detection
+        if (repoUrl.contains("github.com")) {
+            readme = gitHubService.fetchReadme(repoUrl);
+        } else if (repoUrl.contains("gitlab.com")) {
+            readme = gitLabService.fetchReadme(repoUrl);
+        } else {
             return """
-❌ **Invalid GitHub Repository URL**
+❌ **Unsupported Repository Platform**
 
-The URL provided is **not a valid GitHub repository link**.
+Currently supported platforms:
+- GitHub
+- GitLab
 
-✅ Please use the following format:
-https://github.com/username/repository
-
-📌 Example:
-https://github.com/spring-projects/spring-boot
+Please provide a valid repository URL.
 """;
         }
 
-        // ❌ README missing or repository inaccessible
+        // ❌ Invalid URL (only applies to GitHub for now)
+        if ("INVALID_URL".equals(readme)) {
+            return """
+❌ **Invalid Repository URL**
+
+The URL provided is not valid.
+
+✅ Please use:
+- https://github.com/username/repository
+- https://gitlab.com/username/repository
+""";
+        }
+
+        // ❌ README missing
         if ("README_NOT_FOUND".equals(readme)) {
             return """
 ❌ **README.md Not Found**
 
-The provided GitHub repository does **not contain a readable README.md**
-or the repository could not be accessed.
+The repository does not contain a readable README.md
+or could not be accessed.
 
-⚠️ Project Analyzer relies heavily on README.md for accurate analysis.
+⚠️ Project Analyzer relies on README.md for accurate analysis.
 
 ✅ Please ensure:
 - The repository exists
 - It is public
-- A README.md file is present in the root directory
+- README.md is present
 """;
         }
 
-        // ⚠️ README exists but is weak
+        // ⚠️ Weak README
         if ("WEAK_README".equals(readme)) {
             return """
 ⚠️ **Weak README Detected**
 
-A README.md file was found, but it appears to be **too short or insufficiently detailed**.
+A README.md file was found, but it appears to be insufficiently detailed.
 
-⚠️ The analysis may be **generic or partially inaccurate**.
+⚠️ The analysis may be partially generic.
 
-💡 For best results, consider adding:
-- Clear project overview
-- Tech stack used
-- Architecture or workflow
+💡 Consider adding:
+- Project overview
+- Tech stack
+- Architecture
 - Features
-- Possible improvements
+- Improvements
 """;
         }
 
-        // ✅ Step 2: Safe to analyze using LLM
+        // ✅ LLM analysis
         return llmService.analyzeProject(readme);
     }
 }
