@@ -4,6 +4,7 @@ import com.projectanalyzer.project_analyzer.service.GitHubService;
 import com.projectanalyzer.project_analyzer.service.GitLabService;
 import com.projectanalyzer.project_analyzer.service.BitbucketService;
 import com.projectanalyzer.project_analyzer.service.LLMService;
+import com.projectanalyzer.project_analyzer.service.ContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,9 @@ public class AnalyzerController {
 
     @Autowired
     private LLMService llmService;
+
+    @Autowired
+    private ContextService contextService;
 
     @PostMapping("/analyze")
     public String analyzeProject(@RequestBody String repoUrl) {
@@ -97,6 +101,9 @@ A README.md file was found, but it appears to be insufficiently detailed.
 - Improvements
 """;
         }
+
+        contextService.clear();
+        contextService.setReadme(readme);
 
         // ✅ LLM analysis
         return llmService.analyzeProject(readme);

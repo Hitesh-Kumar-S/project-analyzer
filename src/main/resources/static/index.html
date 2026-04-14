@@ -152,6 +152,17 @@ button {
     display: none;
     text-align: center;
 }
+
+/* CHAT ONLY (ADDED) */
+.chat-box {
+    height: 260px;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    font-size: 14px;
+}
 </style>
 </head>
 
@@ -198,7 +209,7 @@ button {
 Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong> repositories and get interview-ready insights instantly.
 </p>
 
-<!-- RULES -->
+<!-- RULES (UNCHANGED) -->
 <div class="instructions">
 
 <h3>📌 General Guidelines</h3>
@@ -259,7 +270,7 @@ Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket<
 </div>
 </div>
 
-<!-- RIGHT PANEL -->
+<!-- RIGHT PANEL (ONLY THIS CHANGED) -->
 <div class="side">
 <div class="side-content">
 
@@ -273,8 +284,16 @@ Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket<
 <p>✅ GitLab</p>
 <p>✅ Bitbucket</p>
 
-<div class="panel-title">🤖 Coming Soon</div>
-<p>Chatbot Assistant</p>
+<div class="panel-title">🤖 Project Chatbot</div>
+
+<div id="chatBox" class="chat-box">
+<p style="opacity:0.7;">Ask questions about the analyzed project...</p>
+</div>
+
+<div style="display:flex; gap:6px; margin-top:10px;">
+<input id="chatInput" placeholder="Ask something..." style="flex:1; padding:8px; border-radius:8px; border:none;">
+<button onclick="sendMessage()">Send</button>
+</div>
 
 </div>
 </div>
@@ -301,6 +320,33 @@ function analyzeProject() {
 
 function toggleTheme() {
     document.body.classList.toggle("dark");
+}
+
+/* CHAT FUNCTION (ADDED ONLY) */
+function sendMessage() {
+    const input = document.getElementById("chatInput");
+    const chatBox = document.getElementById("chatBox");
+
+    const question = input.value.trim();
+    if (!question) return;
+
+    chatBox.innerHTML += `<div><strong>You:</strong> ${question}</div>`;
+
+    input.value = "";
+
+    chatBox.innerHTML += `<div id="typing">Typing...</div>`;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: question
+    })
+    .then(res => res.text())
+    .then(answer => {
+        document.getElementById("typing").remove();
+        chatBox.innerHTML += `<div><strong>Bot:</strong> ${marked.parse(answer)}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
 }
 </script>
 

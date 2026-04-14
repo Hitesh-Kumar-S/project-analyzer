@@ -13,12 +13,53 @@ public class LLMService {
     @Value("${groq.api.key}")
     private String apiKey;
 
-    // Safety limit to avoid sending extremely large READMEs
     private static final int MAX_README_LENGTH = 6000;
 
+    private static final String GROQ_API_URL =
+            "https://api.groq.com/openai/v1/chat/completions";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    // 🔥 =========================
+    // 🔹 GENERIC LLM CALL (NEW)
+    // 🔥 =========================
+    public String callLLM(String prompt) {
+
+        try {
+            JSONObject message = new JSONObject();
+            message.put("role", "user");
+            message.put("content", prompt);
+
+            JSONArray messages = new JSONArray();
+            messages.put(message);
+
+            JSONObject body = new JSONObject();
+            body.put("model", "llama-3.1-8b-instant");
+            body.put("messages", messages);
+            body.put("temperature", 0.2);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(apiKey);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> entity =
+                    new HttpEntity<>(body.toString(), headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(GROQ_API_URL, entity, String.class);
+
+            return extractContent(response.getBody());
+
+        } catch (Exception e) {
+            return "❌ Groq API Error: " + e.getMessage();
+        }
+    }
+
+    // 🔥 =========================
+    // 🔹 PROJECT ANALYSIS (EXISTING)
+    // 🔥 =========================
     public String analyzeProject(String readme) {
 
-        // 🔴 Defensive checks (extra safety)
         if (readme == null || "WEAK_README".equals(readme)) {
             return """
 ❌ Analysis Skipped
@@ -33,10 +74,10 @@ The README.md provided is missing or insufficient.
 """;
         }
 
-        // ✂️ Trim very large READMEs to safe length
         if (readme.length() > MAX_README_LENGTH) {
             readme = readme.substring(0, MAX_README_LENGTH);
         }
+
 
         String prompt = """
 You are an experienced software engineer and a friendly technical interviewer.
@@ -127,46 +168,19 @@ Formatting Guidelines:
 Project README:
 """ + readme;
 
+        return callLLM(prompt);
+    }
 
-        try {
-            String url = "https://api.groq.com/openai/v1/chat/completions";
+    // 🔥 =========================
+    // 🔹 RESPONSE PARSER (NEW)
+    // 🔥 =========================
+    private String extractContent(String responseBody) {
+        JSONObject json = new JSONObject(responseBody);
 
-            // ---- Message ----
-            JSONObject message = new JSONObject();
-            message.put("role", "user");
-            message.put("content", prompt);
-
-            JSONArray messages = new JSONArray();
-            messages.put(message);
-
-            // ---- Request Body ----
-            JSONObject body = new JSONObject();
-            body.put("model", "llama-3.1-8b-instant");
-            body.put("messages", messages);
-            body.put("temperature", 0.2); // lower = less hallucination
-
-            // ---- Headers ----
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(apiKey);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<String> entity =
-                    new HttpEntity<>(body.toString(), headers);
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response =
-                    restTemplate.postForEntity(url, entity, String.class);
-
-            JSONObject json = new JSONObject(response.getBody());
-
-            return json
-                    .getJSONArray("choices")
-                    .getJSONObject(0)
-                    .getJSONObject("message")
-                    .getString("content");
-
-        } catch (Exception e) {
-            return "❌ Groq API Error: " + e.getMessage();
-        }
+        return json
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content");
     }
 }
