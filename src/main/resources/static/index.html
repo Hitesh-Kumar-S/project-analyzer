@@ -1,289 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Project Analyzer</title>
+<meta charset="UTF-8">
+<title>Project Analyzer</title>
 
-    <!-- Markdown Renderer -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <style>
-        :root {
-            --bg-main: #f4f7ff;
-            --bg-side: linear-gradient(180deg, #667eea, #764ba2);
-            --card: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --primary: #5b6cff;
-            --accent: #22c55e;
-        }
+<style>
+:root {
+    --bg-main: #f4f7ff;
+    --bg-side: linear-gradient(180deg, #667eea, #764ba2);
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #5b6cff;
+}
 
-        body.dark {
-            --bg-main: #0f172a;
-            --bg-side: linear-gradient(180deg, #1e293b, #020617);
-            --card: #111827;
-            --text: #e5e7eb;
-            --muted: #9ca3af;
-            --primary: #8b9cff;
-            --accent: #4ade80;
-        }
+body.dark {
+    --bg-main: #0f172a;
+    --bg-side: linear-gradient(180deg, #1e293b, #020617);
+    --card: #111827;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --primary: #8b9cff;
+}
 
-        * { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: var(--bg-main);
+    color: var(--text);
+    display: flex;
+}
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Segoe UI", Inter, system-ui, sans-serif;
-            background: var(--bg-main);
-            color: var(--text);
-            display: flex;
-        }
+/* LAYOUT */
+.side {
+    width: 16%;
+    padding: 18px;
+    background: var(--bg-side);
+    color: white;
+}
 
-        .side { width: 8%; background: var(--bg-side); }
+.main {
+    width: 68%;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
 
-        .main {
-            width: 84%;
-            display: flex;
-            justify-content: center;
-            padding: 40px 0;
-        }
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 32px;
+}
 
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background: var(--card);
-            border-radius: 18px;
-            padding: 36px 42px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-        }
+/* SIDE PANEL */
+.side-content {
+    background: rgba(255,255,255,0.08);
+    padding: 18px;
+    border-radius: 12px;
+}
 
-        .top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.profile {
+    text-align: center;
+}
 
-        h1 { font-size: 36px; margin: 0; }
+.links a {
+    display: block;
+    margin: 6px 0;
+    color: white;
+    text-decoration: none;
+}
 
-        .toggle {
-            background: transparent;
-            border: 2px solid var(--primary);
-            padding: 8px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+.panel-title {
+    margin-top: 14px;
+    font-weight: bold;
+}
 
-        .subtitle {
-            margin-top: 10px;
-            font-size: 18px;
-            color: var(--muted);
-        }
+.stats p {
+    margin: 5px 0;
+}
 
-        .instructions {
-            margin-top: 30px;
-            padding: 20px;
-            border-left: 6px solid var(--primary);
-            background: rgba(91,108,255,0.08);
-            border-radius: 12px;
-        }
+/* MAIN */
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .instructions h4 {
-            margin-top: 15px;
-            color: var(--primary);
-        }
+.toggle {
+    background: transparent;
+    border: 2px solid var(--primary);
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
-        .instructions hr {
-            margin: 20px 0;
-            border: none;
-            border-top: 1px solid #ccc;
-        }
+.instructions {
+    margin-top: 20px;
+    padding: 20px;
+    border-left: 4px solid var(--primary);
+    background: rgba(91,108,255,0.08);
+    border-radius: 10px;
+}
 
-        .input-section {
-            margin-top: 30px;
-            display: flex;
-            gap: 12px;
-        }
+.instructions ul {
+    padding-left: 20px;
+}
 
-        input {
-            flex: 1;
-            padding: 14px;
-            font-size: 17px;
-            border-radius: 10px;
-            border: 1px solid #c7c9d1;
-        }
+.instructions li {
+    margin-bottom: 6px;
+}
 
-        button {
-            padding: 14px 24px;
-            border-radius: 10px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-        }
+.input-section {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
 
-        .spinner {
-            display: none;
-            text-align: center;
-            margin-top: 30px;
-        }
+input {
+    flex: 1;
+    padding: 12px;
+}
 
-        .spinner div {
-            width: 42px;
-            height: 42px;
-            border: 5px solid #c7c9d1;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: auto;
-        }
+button {
+    padding: 12px 18px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+/* RESULT */
+.result {
+    margin-top: 20px;
+    padding: 20px;
+    line-height: 1.8;
+}
 
-        .result-wrapper { margin-top: 35px; }
+.result p {
+    margin: 12px 0;
+}
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
+.result li {
+    margin-bottom: 8px;
+}
 
-        .result {
-            background: var(--bg-main);
-            padding: 26px;
-            border-radius: 14px;
-            font-size: 18px;
-            line-height: 1.8;
-            max-height: 480px;
-            overflow-y: auto;
-        }
-
-        .result h2 {
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 6px;
-        }
-
-        .footer {
-            margin-top: 35px;
-            text-align: center;
-            font-size: 15px;
-            color: var(--muted);
-        }
-    </style>
+.spinner {
+    display: none;
+    text-align: center;
+}
+</style>
 </head>
 
 <body>
 
-<div class="side"></div>
+<!-- LEFT PANEL -->
+<div class="side">
+<div class="side-content">
 
+<div class="profile">
+<h3>👨‍💻 Hitesh Kumar</h3>
+<p>Backend Developer</p>
+</div>
+
+<div class="panel-title">🔗 Profiles</div>
+<div class="links">
+<a href="https://github.com/Hitesh-Kumar-S" target="_blank">💻 GitHub</a>
+<a href="https://www.linkedin.com/in/hitesh-kumar-s-579b922b0/" target="_blank">🔗 LinkedIn</a>
+<a href="https://leetcode.com/u/SHK_2006/" target="_blank">🧠 LeetCode</a>
+<a href="https://www.hackerrank.com/profile/hitesh_kumar_s" target="_blank">🏆 HackerRank</a>
+<a href="https://www.codechef.com/users/shk_2006" target="_blank">🍴 CodeChef</a>
+</div>
+
+<div class="stats">
+<div class="panel-title">📊 Stats</div>
+<p>💡 Projects: 3</p>
+<p>🔥 DSA Practice: Active</p>
+<p>⚡ Java • Spring Boot • AI</p>
+</div>
+
+</div>
+</div>
+
+<!-- MAIN -->
 <div class="main">
 <div class="container">
 
-    <div class="top">
-        <h1>🚀 Project Analyzer</h1>
-        <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
-    </div>
+<div class="top">
+<h1>🚀 Project Analyzer</h1>
+<button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+</div>
 
-    <p class="subtitle">
-        Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong> repositories and get interview-ready insights instantly.
-    </p>
+<p>
+Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong> repositories and get interview-ready insights instantly.
+</p>
 
-    <!-- UPDATED INSTRUCTIONS -->
-    <div class="instructions">
+<!-- RULES -->
+<div class="instructions">
 
-        <h3>📌 General Requirements</h3>
-        <ul>
-            <li>The repository must be <strong>public</strong>.</li>
-            <li>A <strong>README.md</strong> must be present in the <strong>root directory</strong>.</li>
-            <li>The default branch should be <strong>main</strong> or <strong>master</strong>.</li>
-            <li>The README should include:
-                <ul>
-                    <li><strong>Project overview</strong></li>
-                    <li><strong>Tech stack</strong></li>
-                    <li><strong>Architecture</strong></li>
-                    <li><strong>Features</strong></li>
-                </ul>
-            </li>
-        </ul>
+<h3>📌 General Guidelines</h3>
+<ul>
+<li>Make sure the repository is <strong>public</strong>.</li>
+<li>A <strong>README.md</strong> should be available in the <strong>root directory</strong>.</li>
+<li>The default branch is usually <strong>main</strong> or <strong>master</strong>.</li>
+<li>For best results, the README can include:
+<ul>
+<li><strong>Project overview</strong></li>
+<li><strong>Tech stack</strong></li>
+<li><strong>Architecture</strong></li>
+<li><strong>Features</strong></li>
+</ul>
+</li>
+</ul>
 
-        <hr>
+<hr>
 
-        <h3>🌐 Platform Instructions</h3>
+<h3>🌐 Platform Tips</h3>
 
-        <h4>🐙 GitHub</h4>
-        <ul>
-            <li><strong>https://github.com/username/repository</strong></li>
-            <li>README in <strong>root</strong></li>
-            <li>Branch: <strong>main</strong> or <strong>master</strong></li>
-        </ul>
+<p><strong>🐙 GitHub</strong></p>
+<ul>
+<li>https://github.com/username/repository</li>
+<li>README in root</li>
+<li>Branch: main or master</li>
+</ul>
 
-        <h4>🦊 GitLab</h4>
-        <ul>
-            <li><strong>https://gitlab.com/username/repository</strong></li>
-            <li>Repository must be <strong>public</strong></li>
-            <li>README in <strong>root</strong></li>
-            <li>Branch: <strong>main</strong> or <strong>master</strong></li>
-        </ul>
+<p><strong>🦊 GitLab</strong></p>
+<ul>
+<li>https://gitlab.com/username/repository</li>
+<li>Repository should be public</li>
+<li>README in root</li>
+<li>Branch: main or master</li>
+</ul>
 
-        <h4>🪣 Bitbucket</h4>
-        <ul>
-            <li><strong>https://bitbucket.org/workspace/repository</strong></li>
-            <li>Do NOT include <strong>/src/branch/</strong></li>
-            <li>README in <strong>root</strong></li>
-            <li>Branch: <strong>main</strong> or <strong>master</strong></li>
-        </ul>
+<p><strong>🪣 Bitbucket</strong></p>
+<ul>
+<li>https://bitbucket.org/workspace/repository</li>
+<li>Avoid /src/branch in URL</li>
+<li>README in root</li>
+<li>Branch: main or master</li>
+</ul>
 
-    </div>
+</div>
 
-    <!-- INPUT -->
-    <div class="input-section">
-        <input id="repoUrl" placeholder="Enter repository URL">
-        <button id="analyzeBtn" onclick="analyzeProject()">Analyze</button>
-    </div>
+<div class="input-section">
+<input id="repoUrl" placeholder="Enter repository URL">
+<button onclick="analyzeProject()">Analyze</button>
+</div>
 
-    <!-- LOADING -->
-    <div class="spinner" id="spinner">
-        <div></div>
-        <p>Analyzing project…</p>
-    </div>
+<div class="spinner" id="spinner">
+<p>Analyzing...</p>
+</div>
 
-    <!-- RESULT -->
-    <div class="result-wrapper">
-        <div class="actions">
-            <button onclick="copyResult()">📋 Copy</button>
-        </div>
-        <div id="result" class="result">
-            <p style="color: var(--muted)">
-                The analyzed project details will appear here.
-            </p>
-        </div>
-    </div>
-
-    <div class="footer">
-        Built with Spring Boot • Multi-Platform Support • LLM Integration
-    </div>
+<div id="result" class="result"></div>
 
 </div>
 </div>
 
-<div class="side"></div>
+<!-- RIGHT PANEL -->
+<div class="side">
+<div class="side-content">
+
+<div class="panel-title">💡 Tips</div>
+<p>✔ Use structured README</p>
+<p>✔ Include architecture</p>
+<p>✔ Add setup steps</p>
+
+<div class="panel-title">🚀 Features</div>
+<p>✅ GitHub</p>
+<p>✅ GitLab</p>
+<p>✅ Bitbucket</p>
+
+<div class="panel-title">🤖 Coming Soon</div>
+<p>Chatbot Assistant</p>
+
+</div>
+</div>
 
 <script>
 function analyzeProject() {
-    const repoUrl = document.getElementById("repoUrl").value.trim();
+    const repoUrl = document.getElementById("repoUrl").value;
     const result = document.getElementById("result");
     const spinner = document.getElementById("spinner");
-    const button = document.getElementById("analyzeBtn");
-
-    if (!repoUrl) {
-        alert("Please enter a repository URL");
-        return;
-    }
 
     spinner.style.display = "block";
-    button.disabled = true;
-    result.innerHTML = "<p>Analyzing... ⏳</p>";
 
     fetch("/analyze", {
         method: "POST",
@@ -294,19 +296,7 @@ function analyzeProject() {
     .then(text => {
         result.innerHTML = marked.parse(text);
         spinner.style.display = "none";
-        button.disabled = false;
-    })
-    .catch(() => {
-        result.innerHTML = "<p>❌ Error occurred while analyzing the project.</p>";
-        spinner.style.display = "none";
-        button.disabled = false;
     });
-}
-
-function copyResult() {
-    const text = document.getElementById("result").innerText;
-    navigator.clipboard.writeText(text);
-    alert("Analysis copied!");
 }
 
 function toggleTheme() {
