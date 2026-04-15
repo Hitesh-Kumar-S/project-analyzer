@@ -10,65 +10,67 @@ It helps **students and developers** quickly understand, revise, and confidently
 
 Students and developers often build projects for:
 
-* Learning
-* Coursework
-* Resume building
-* Professional growth
+- Learning  
+- Coursework  
+- Resume building  
+- Professional growth  
 
 Over time, remembering:
 
-* Design decisions
-* Architecture
-* Features
+- Design decisions  
+- Architecture  
+- Features  
 
 becomes difficult — especially before interviews.
 
 Manually revisiting code is:
 
-* ⏱️ Time-consuming
-* 😓 Inefficient
+- ⏱️ Time-consuming  
+- 😓 Inefficient  
 
 ### ✅ Solution
 
 This project solves that by:
 
-* Using `README.md` as the **single source of truth**
-* Generating **structured explanations using AI**
-* Ensuring **accurate, non-hallucinated output**
+- Using `README.md` as the **single source of truth**  
+- Generating **structured explanations using AI**  
+- Ensuring **accurate, non-hallucinated output**  
 
 ---
 
 ## 🧠 How It Works
 
-```
+
 User Input (Repo URL)
-        ↓
+↓
 Controller
-        ↓
-Repository Service (GitHub / GitLab)
-        ↓
+↓
+Repository Service (GitHub / GitLab / Bitbucket)
+↓
 Fetch README.md
-        ↓
+↓
+Context Storage
+↓
 LLM (LLaMA 3.1 via Groq)
-        ↓
-Structured Analysis
-        ↓
+↓
+Structured Analysis / Chat Response
+↓
 User Interface
-```
+
 
 ### 🔄 Flow Explanation
 
-1. User enters a repository URL
-2. Backend detects platform (**GitHub / GitLab**)
-3. README is fetched using respective APIs
+1. User enters a repository URL  
+2. Backend detects platform (**GitHub / GitLab / Bitbucket**)  
+3. README is fetched using respective APIs  
 4. Validation is performed:
-
-   * URL correctness
-   * Repository accessibility
-   * README presence
-   * Documentation quality
-5. README is sent to **LLM for analysis**
-6. Structured output is displayed
+   - URL correctness  
+   - Repository accessibility  
+   - README presence  
+   - Documentation quality  
+5. README is stored as **context**  
+6. README is sent to **LLM for analysis**  
+7. User can ask follow-up questions via chatbot  
 
 ---
 
@@ -76,50 +78,58 @@ User Interface
 
 ### 🔍 Core Functionality
 
-* README-based analysis (no assumptions)
-* Multi-platform support:
+- README-based analysis (no assumptions)  
+- Multi-platform support:
+  - ✅ GitHub  
+  - ✅ GitLab  
+  - ✅ Bitbucket  
 
-  * ✅ GitHub
-  * ✅ GitLab
-  * 🔜 Bitbucket (planned)
+---
+
+### 🤖 Chatbot (NEW)
+
+- Ask questions about the analyzed project  
+- Context-aware responses  
+- No hallucination (strict prompt control)  
 
 ---
 
 ### ⚠️ Smart Validation
 
-* Invalid repository URL detection
-* Missing README detection
-* Weak documentation detection
+- Invalid repository URL detection  
+- Missing README detection  
+- Weak documentation detection  
 
 ---
 
 ### 🧩 Structured Output
 
-* Project Overview
-* Key Features
-* Tech Stack
-* Architecture / Flow
-* Interview Explanation
-* Improvements
-* README Quality Score
-* Missing Documentation Sections
+- Project Overview  
+- Key Features  
+- Tech Stack  
+- Architecture / Flow  
+- Interview Explanation  
+- Improvements  
+- README Quality Score  
+- Missing Documentation Sections  
 
 ---
 
 ### 🧠 Responsible AI Usage
 
-* No hallucination
-* Explicit handling of missing data
-* Clear and honest responses
+- No hallucination  
+- Explicit handling of missing data  
+- Clear and honest responses  
 
 ---
 
 ### 🎨 User Experience
 
-* Markdown rendering
-* Dark mode 🌙
-* Copy-to-clipboard 📋
-* Loading indicators ⏳
+- Markdown rendering  
+- Dark mode 🌙  
+- Copy-to-clipboard 📋  
+- Loading indicators ⏳  
+- Chat interface 🤖  
 
 ---
 
@@ -127,17 +137,17 @@ User Interface
 
 ### 👨‍🎓 Students
 
-* Revise projects quickly
-* Prepare for interviews & viva
-* Learn structured explanation
+- Revise projects quickly  
+- Prepare for interviews & viva  
+- Learn structured explanation  
 
 ---
 
 ### 👨‍💻 Developers
 
-* Understand unfamiliar repositories
-* Evaluate documentation quality
-* Get quick technical summaries
+- Understand unfamiliar repositories  
+- Evaluate documentation quality  
+- Get quick technical summaries  
 
 ---
 
@@ -145,28 +155,29 @@ User Interface
 
 ### Backend
 
-* **Java** – Core programming language
-* **Spring Boot** – Backend framework for REST APIs
-* **REST APIs** – Communication layer
-* **Maven** – Build and dependency management
+- **Java** – Core programming language  
+- **Spring Boot** – Backend framework for REST APIs  
+- **REST APIs** – Communication layer  
+- **Maven** – Build and dependency management  
 
 ---
 
 ### Frontend
 
-* **HTML** – Structure
-* **CSS** – Styling
-* **JavaScript** – Interactivity
-* **Marked.js** – Markdown rendering
+- **HTML** – Structure  
+- **CSS** – Styling  
+- **JavaScript** – Interactivity  
+- **Marked.js** – Markdown rendering  
 
 ---
 
 ### AI & APIs
 
-* **Groq API** – LLM inference platform
-* **LLaMA 3.1 (8B)** – AI model for analysis
-* **GitHub REST API** – Fetch README
-* **GitLab API** – Fetch README using project ID
+- **Groq API** – LLM inference platform  
+- **LLaMA 3.1 (8B)** – AI model for analysis  
+- **GitHub REST API** – Fetch README  
+- **GitLab API** – Fetch README  
+- **Bitbucket API** – Fetch README  
 
 ---
 
@@ -176,24 +187,31 @@ User Interface
 
 The application follows a **modular service-based architecture**:
 
-```
+
 Controller
-   ↓
+↓
 RepositoryService (Interface)
-   ↓
- ├── GitHubService
- ├── GitLabService
- └── (Future: BitbucketService)
-   ↓
+↓
+├── GitHubService
+├── GitLabService
+├── BitbucketService
+↓
+ContextService
+↓
 LLMService
-```
+↓
+ChatService
+
+
+---
 
 ### 🔹 Key Design Decisions
 
-* **Abstraction Layer** using `RepositoryService`
-* **Platform-independent logic**
-* Easy extensibility for new platforms
-* Clean separation of concerns
+- **Abstraction Layer** using `RepositoryService`  
+- Platform-independent design  
+- Context reuse for chatbot  
+- Separation of concerns  
+- Scalable and extensible architecture  
 
 ---
 
@@ -201,143 +219,86 @@ LLMService
 
 ### 🔹 Prerequisites
 
-* Java 17+
-* Maven
-* Git
+- Java 17+  
+- Maven  
+- Git  
 
 ---
 
 ### 🔹 Clone the Repository
 
-```
+```bash
 git clone https://github.com/your-username/project-analyzer.git
 cd project-analyzer
-```
-
----
-
-### 🔹 Configure Environment Variables
-
-#### Windows (PowerShell):
-
-```
+🔹 Configure Environment Variables
+Windows (PowerShell)
 setx GROQ_API_KEY "your_api_key"
-```
-
-#### Linux / Mac:
-
-```
+Linux / Mac
 export GROQ_API_KEY=your_api_key
-```
+🔹 Configure Application
 
----
+In application.properties:
 
-### 🔹 Application Configuration
-
-`application.properties`
-
-```
 groq.api.key=${GROQ_API_KEY}
-```
-
----
-
-### 🔹 Run the Application
-
-```
+🔹 Build the Project
+mvn clean install
+🔹 Run the Application
 mvn spring-boot:run
-```
-
----
-
-### 🔹 Access the App
-
-```
+🔹 Access the App
 http://localhost:8080
-```
+📌 Usage
+🔹 Example 1 — Analyze Repository
 
----
+Input:
 
-## 📌 Usage
+https://github.com/spring-projects/spring-boot
 
-1. Open the web interface
-2. Enter repository URL:
+Output:
 
-```
-https://github.com/username/repo
-OR
-https://gitlab.com/username/repo
-```
+Project overview
+Features
+Tech stack
+Architecture
+Interview explanation
+🔹 Example 2 — Chatbot
 
-3. Click **Analyze**
-4. View structured output
+After analysis, ask:
 
----
+What is the tech stack?
+Explain the architecture
+What improvements can be made?
+⚠️ Important Notes
+Only public repositories are supported
+README.md must be present
+Better documentation → better analysis
+🔮 Future Enhancements
+Private repository support (authentication)
+Caching for faster responses
+Advanced README scoring
+Code-level analysis (beyond README)
+RAG-based full repo understanding
+🚀 Deployment
+Designed for deployment on Render
+Supports Docker containerization
+Uses environment variables for secrets
+🔐 Security
+API keys are NOT stored in code
+Uses environment variables
+Prevents secret exposure
+📄 License
 
-## ⚠️ Important Notes
+This project is intended for:
 
-* Only **public repositories** are supported
-* `README.md` must be present
-* Better documentation → better analysis
-
----
-
-## 🔮 Future Enhancements
-
-* Bitbucket integration
-* Private repository support (authentication)
-* Caching for faster responses
-* Advanced README scoring
-* Chatbot for interactive Q&A
-* Deployment monitoring
-
----
-
-## 🚀 Deployment
-
-* Designed for deployment on **Render**
-* Uses **environment variables for secrets**
-* Supports containerization via Docker
-
----
-
-## 🔐 Security
-
-* API keys are **NOT stored in code**
-* Uses **environment variables**
-* Prevents secret exposure
-
----
-
-## 📄 License
-
-This project is for:
-
-* Learning
-* Demonstration
-* Portfolio use
-
----
-
-## 🙌 Final Note
+Learning
+Demonstration
+Portfolio use
+🙌 Final Note
 
 This project focuses on:
 
-* Clean architecture
-* User clarity
-* Responsible AI usage
-* Real-world engineering practices
+Clean architecture
+User clarity
+Responsible AI usage
+Real-world engineering practices
 
-It is designed to help **students succeed in interviews** while also being useful for developers.
-
----
-
-## ⭐ Support
-
-If you found this helpful:
-
-* ⭐ Star the repository
-* 🍴 Fork it
-* 🛠️ Contribute
-
----
+It is designed to help students succeed in interviews while also being useful for developers.
