@@ -1,5 +1,7 @@
 package com.projectanalyzer.project_analyzer.controller;
 
+import com.projectanalyzer.project_analyzer.dto.ChatRequest;
+import org.springframework.http.ResponseEntity;
 import com.projectanalyzer.project_analyzer.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,17 +14,28 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("/chat")
-    public String chat(@RequestBody String question) {
+    public ResponseEntity<String> chat(@RequestBody ChatRequest request) {
 
-        // Clean input
-        if (question == null || question.trim().isEmpty()) {
-            return """
-⚠️ **Empty Question**
+        String response = chatService.chat(
+            request.getQuestion(),
+            request.isStrictMode()
+        );
 
-Please enter a valid question about the project.
-""";
-        }
-
-        return chatService.chat(question.trim());
+        return ResponseEntity.ok(response);
     }
+
+//     @PostMapping("/chat")
+//     public String chat(@RequestBody String question) {
+
+//         // Clean input
+//         if (question == null || question.trim().isEmpty()) {
+//             return """
+// ⚠️ **Empty Question**
+
+// Please enter a valid question about the project.
+// """;
+//         }
+
+//         return chatService.chat(question.trim());
+//     }
 }

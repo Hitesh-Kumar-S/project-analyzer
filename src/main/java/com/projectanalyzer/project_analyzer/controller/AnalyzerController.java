@@ -1,10 +1,10 @@
 package com.projectanalyzer.project_analyzer.controller;
 
+import com.projectanalyzer.project_analyzer.service.BitbucketService;
+import com.projectanalyzer.project_analyzer.service.ContextService;
 import com.projectanalyzer.project_analyzer.service.GitHubService;
 import com.projectanalyzer.project_analyzer.service.GitLabService;
-import com.projectanalyzer.project_analyzer.service.BitbucketService;
-import com.projectanalyzer.project_analyzer.service.LLMService;
-import com.projectanalyzer.project_analyzer.service.ContextService;
+import com.projectanalyzer.project_analyzer.service.GroqLLMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +22,7 @@ public class AnalyzerController {
     private BitbucketService bitbucketService;
 
     @Autowired
-    private LLMService llmService;
+    private GroqLLMService groqllmService;
 
     @Autowired
     private ContextService contextService;
@@ -31,18 +31,31 @@ public class AnalyzerController {
     public String analyzeProject(@RequestBody String repoUrl) {
 
         String readme;
+        String structure;
+        String keyFiles;
 
-if (repoUrl.contains("github.com")) {
-    readme = gitHubService.fetchReadme(repoUrl);
+        // ===================== PLATFORM DETECTION =====================
 
-} else if (repoUrl.contains("gitlab.com")) {
-    readme = gitLabService.fetchReadme(repoUrl);
+        if (repoUrl.contains("github.com")) {
 
-} else if (repoUrl.contains("bitbucket.org")) {
-    readme = bitbucketService.fetchReadme(repoUrl);
+            readme = gitHubService.fetchReadme(repoUrl);
+            structure = gitHubService.fetchRepoStructure(repoUrl);
+            keyFiles = gitHubService.fetchKeyFiles(repoUrl);
 
-} else {
-    return """
+        } else if (repoUrl.contains("gitlab.com")) {
+
+            readme = gitLabService.fetchReadme(repoUrl);
+            structure = gitLabService.fetchRepoStructure(repoUrl);
+            keyFiles = gitLabService.fetchKeyFiles(repoUrl);
+
+        } else if (repoUrl.contains("bitbucket.org")) {
+
+            readme = bitbucketService.fetchReadme(repoUrl);
+            structure = bitbucketService.fetchRepoStructure(repoUrl);
+            keyFiles = bitbucketService.fetchKeyFiles(repoUrl);
+
+        } else {
+            return """
 ❌ **Unsupported Repository Platform**
 
 Currently supported platforms:
@@ -52,39 +65,36 @@ Currently supported platforms:
 
 Please provide a valid repository URL.
 """;
-}
+        }
 
-        // ❌ Invalid URL (only applies to GitHub for now)
+        // ===================== VALIDATIONS (CRITICAL FIX) =====================
+
         if ("INVALID_URL".equals(readme)) {
             return """
 ❌ **Invalid Repository URL**
 
-The URL provided is not valid.
+Please check:
+- Username
+- Repository name
+- URL format
 
-✅ Please use:
-- https://github.com/username/repository
-- https://gitlab.com/username/repository
+Example:
+https://github.com/user/repo
 """;
         }
 
-        // ❌ README missing
         if ("README_NOT_FOUND".equals(readme)) {
             return """
 ❌ **README.md Not Found**
 
-The repository does not contain a readable README.md
-or could not be accessed.
+This repository does not contain a readable README.
 
-⚠️ Project Analyzer relies on README.md for accurate analysis.
-
-✅ Please ensure:
-- The repository exists
-- It is public
-- README.md is present
+👉 Please ensure:
+- Repository is public
+- README.md exists
 """;
         }
 
-        // ⚠️ Weak README
         if ("WEAK_README".equals(readme)) {
             return """
 ⚠️ **Weak README Detected**
@@ -102,10 +112,25 @@ A README.md file was found, but it appears to be insufficiently detailed.
 """;
         }
 
+        // ===================== SAFETY FALLBACK =====================
+
+        if (keyFiles == null || keyFiles.isBlank()) {
+            keyFiles = "No key files available.";
+        }
+
+        if (structure == null || structure.isBlank()) {
+            structure = "No repository structure available.";
+        }
+
+        // ===================== STORE CONTEXT =====================
+
         contextService.clear();
         contextService.setReadme(readme);
+        contextService.setRepoStructure(structure);
+        contextService.setKeyFiles(keyFiles);
 
-        // ✅ LLM analysis
-        return llmService.analyzeProject(readme);
+        // ===================== LLM ANALYSIS =====================
+
+        return groqllmService.analyzeProject(readme);
     }
 }

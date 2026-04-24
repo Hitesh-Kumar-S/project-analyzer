@@ -2,7 +2,6 @@ package com.projectanalyzer.project_analyzer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-// import com.projectanalyzer.project_analyzer.service.LLMService;
 
 @Service
 public class ChatService {
@@ -11,80 +10,92 @@ public class ChatService {
     private ContextService contextService;
 
     @Autowired
-    private LLMService llmService;
+    private GroqLLMService groqService;
 
-    public String chat(String userQuestion) {
+    @Autowired
+    private OpenRouterLLMService openRouterService;
 
-        // ❌ No context available
+    public String chat(String question, boolean strictMode) {
+
         if (!contextService.hasContext()) {
-            return """
-❌ **No Project Context Found**
-
-Please analyze a repository first before asking questions.
-
-💡 Paste a repository URL and click **Analyze**, then try asking your question again.
-""";
+            return "❌ Please analyze a repository first.";
         }
 
-        String readme = contextService.getReadme();
+        String context = contextService.buildContext();
 
-        // 🧠 Build chatbot prompt
-        String prompt = """
-You are a **strict and precise software engineering assistant**.
+        String prompt = strictMode
+                ? buildStrictPrompt(context, question)
+                : buildSmartPrompt(context, question);
 
-Your task is to answer questions about a project using ONLY the provided project context.
+        if (strictMode) {
+    return groqService.generateResponse(prompt);
+} else {
+    try {
+        return openRouterService.generateResponse(prompt);
+    } catch (Exception e) {
+        // 🔥 fallback to Groq
+        try {
+            return groqService.generateResponse(prompt);
+        } catch (Exception ex) {
+            return "⚠️ I'm experiencing high traffic. Please try again in a few moments.";
+        }
+    }
+}
+    }
 
----
+    // 🔒 STRICT MODE
+    private String buildStrictPrompt(String context, String question) {
+        return """
+You are an AI assistant.
 
-❗ STRICT RULES (VERY IMPORTANT)
+Answer ONLY using the project README content below.
+Do NOT use any external knowledge.
+Do NOT guess or assume anything.
 
-- Answer ONLY using the given project context.
-- Do NOT assume, infer, or guess anything.
-- Do NOT introduce external knowledge.
-- If the answer is not clearly present, say exactly:
-  "This is not mentioned in the project README."
-- Do NOT add unrelated explanations.
--If the question is outside the scope of the project, respond:
-  "This question is outside the scope of the project documentation."
+If the answer is not present in the README, respond exactly with:
+"This is not mentioned in the project README."
 
----
+README:
+%s
 
-🎯 ACCURACY RULES
+Question:
+%s
+""".formatted(context, question);
+    }
 
-- If the question is about tools (e.g., Maven, Spring Boot):
-  - Only explain them in the context of THIS project.
-  - Do NOT give generic textbook definitions unless they are clearly relevant.
+    // 🧠 SMART MODE (IMPROVED 🔥)
+    private String buildSmartPrompt(String context, String question) {
+        return """
+You are an expert software engineer and AI assistant.
 
-- If something is partially mentioned:
-  - Answer ONLY the known part.
-  - Clearly state what is missing.
+You are helping a user understand a project and answer technical questions.
 
----
+You are given project context (README + structure), but you are NOT limited to it.
 
-💬 RESPONSE STYLE
+You can:
+- Answer questions about the project
+- Explain technologies
+- Suggest improvements
+- Compare tech stacks
+- Answer general programming questions
 
-- Keep answers **concise and clear**
-- Use bullet points where helpful
-- Highlight key terms in **bold**
-- Avoid long paragraphs
+IMPORTANT:
+- Use project context when relevant
+- If context is missing, use your own knowledge
+- Do NOT say "according to the README"
+- Do NOT restrict yourself only to the context
+- Give clear, confident, and direct answers
 
----
+Tone:
+- Professional
+- Concise
+- Interview-ready
 
-📦 PROJECT CONTEXT:
-""" + readme + """
+Context:
+%s
 
----
-
-❓ USER QUESTION:
-""" + userQuestion + """
-
----
-
-✅ FINAL ANSWER:
-
-Answer:
-""";
-
-        return llmService.callLLM(prompt);
+Question:
+%s
+""".formatted(context, question);
     }
 }

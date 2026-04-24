@@ -1,0 +1,198 @@
+package com.projectanalyzer.project_analyzer.service;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class GroqLLMService implements LLMService {
+
+    @Value("${groq.api.key}")
+    private String apiKey;
+
+    private static final int MAX_README_LENGTH = 6000;
+
+    private static final String GROQ_API_URL =
+            "https://api.groq.com/openai/v1/chat/completions";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    // 🔥 =========================
+    // 🔹 GENERIC LLM CALL (NEW)
+    // 🔥 =========================
+    public String callLLM(String prompt) {
+
+        try {
+            JSONObject message = new JSONObject();
+            message.put("role", "user");
+            message.put("content", prompt);
+
+            JSONArray messages = new JSONArray();
+            messages.put(message);
+
+            JSONObject body = new JSONObject();
+            body.put("model", "llama-3.1-8b-instant");
+            body.put("messages", messages);
+            body.put("temperature", 0.2);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(apiKey);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> entity =
+                    new HttpEntity<>(body.toString(), headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(GROQ_API_URL, entity, String.class);
+
+            return extractContent(response.getBody());
+
+        } catch (Exception e) {
+            return "❌ Groq API Error: " + e.getMessage();
+        }
+    }
+
+    // 🔥 =========================
+    // 🔹 PROJECT ANALYSIS (EXISTING)
+    // 🔥 =========================
+    public String analyzeProject(String readme) {
+
+        if (readme == null || "WEAK_README".equals(readme)) {
+            return """
+❌ Analysis Skipped
+
+The README.md provided is missing or insufficient.
+
+⚠️ To generate an accurate project analysis, please ensure the README contains:
+- Clear project overview
+- Tech stack
+- Architecture or flow
+- Features and improvements
+""";
+        }
+
+        if (readme.length() > MAX_README_LENGTH) {
+            readme = readme.substring(0, MAX_README_LENGTH);
+        }
+
+
+        String prompt = """
+You are an experienced software engineer and a friendly technical interviewer.
+
+Analyze the following software project using ONLY the information explicitly available in the README.md.
+Please do NOT assume or invent missing details.
+If something is not mentioned, gently state that it is not specified in the README.
+
+Explain the project in a **clear, professional, and supportive tone**, as if guiding the project owner during an interview.
+Highlight **important concepts, technologies, and conclusions in bold** so they are easy to notice.
+
+Use the following structure:
+
+### **1. Project Overview**
+- Explain **what the project does** and **what problem it aims to solve**.
+- If the problem statement is unclear, mention this politely.
+
+### **2. Key Features**
+- Summarize the **main functionalities or capabilities** described in the README.
+- If features are limited, acknowledge them without being harsh.
+
+### **3. Tech Stack Used**
+- List the **programming languages, frameworks, tools, or platforms** explicitly mentioned.
+- Highlight each technology in **bold**.
+- Do not assume technologies that are not stated.
+
+### **4. Architecture / Design Approach**
+- Describe the project flow in an **action → action format** (using arrows `→`) if architecture or flow is mentioned.
+- Example format:  
+  **User Request → Controller → Service Layer → Database → Response**
+- Keep the flow **simple, linear, and easy to understand**.
+- If architectural details are not mentioned, state in a neutral way:  
+  **"The README does not explicitly describe the system architecture or execution flow."**
+
+### **5. Interview Explanation (2 minutes)**
+- Explain the project as if the **project owner** is confidently describing it in an interview.
+- Keep it **concise, structured, and easy to understand**.
+- Emphasize **key technical decisions** in bold.
+
+### **6. README Quality Score**
+-Evaluate the README based ONLY on available content.
+-Make sure that the heading are bolded. 
+-Scoring Criteria (0–10 each):
+
+-Clarity
+-Completeness
+-Structure
+-Setup Instructions
+-Examples / Usage
+
+Format (STRICT):
+
+- **Clarity**: X1/10  
+- **Completeness**: X2/10  
+- **Structure**: X3/10  
+- **Setup Instructions**: X4/10  
+- **Examples/Usage**: X5/10  
+
+**Final Score**: (X1 + X2 + X3 + X4 + X5)/10
+
+-Keep the evaluation fair, realistic, and encouraging.
+-If something is missing, reflect it in the score gently.
+
+### **7. Missing or Weak Documentation Sections**
+-Identify important sections that are missing or insufficient, such as:
+-Setup Instructions
+-Usage Examples
+-Architecture
+-Contribution Guidelines
+-License
+-Present it in a helpful way:
+-"The README could be improved by adding: ..."
+
+### **8. Possible Improvements or Extensions**
+- Suggest **realistic and constructive improvements** based on the current scope.
+- Avoid speculative or overly advanced features if the README does not suggest them.
+
+### **Positive Closing Note**
+- End with a **supportive and encouraging statement** about the project.
+- Acknowledge the effort and potential for future growth.
+
+Formatting Guidelines:
+- Use **bold text** for important terms, technologies, and key takeaways.
+- Use clear section headings.
+- Keep the tone **friendly, neutral, and professional**.
+- Avoid harsh or judgmental language.
+
+Project README:
+""" + readme;
+
+        return callLLM(prompt);
+    }
+
+    // 🔥 =========================
+    // 🔹 RESPONSE PARSER (NEW)
+    // 🔥 =========================
+    private String extractContent(String responseBody) {
+        JSONObject json = new JSONObject(responseBody);
+
+        return json
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content");
+    }
+
+    // 🔥 =========================
+    // 🔹 CHAT RESPONSE (NEW FIX)
+    // 🔥 =========================
+    public String chatResponse(String prompt) {
+        return callLLM(prompt); // direct LLM call (no analysis format)
+    }
+
+    @Override
+    public String generateResponse(String prompt) {
+        return callLLM(prompt);
+    }
+}

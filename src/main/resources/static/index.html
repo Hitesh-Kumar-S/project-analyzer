@@ -9,7 +9,6 @@
 <style>
 :root {
     --bg-main: #f4f7ff;
-    --bg-side: linear-gradient(180deg, #667eea, #764ba2);
     --card: #ffffff;
     --text: #1f2937;
     --muted: #6b7280;
@@ -18,8 +17,7 @@
 
 body.dark {
     --bg-main: #0f172a;
-    --bg-side: linear-gradient(180deg, #1e293b, #020617);
-    --card: #111827;
+    --card: #1e293b;
     --text: #e5e7eb;
     --muted: #9ca3af;
     --primary: #8b9cff;
@@ -30,275 +28,455 @@ body {
     font-family: "Segoe UI", sans-serif;
     background: var(--bg-main);
     color: var(--text);
-    display: flex;
-}
-
-/* LAYOUT */
-.side {
-    width: 16%;
-    padding: 18px;
-    background: var(--bg-side);
-    color: white;
-}
-
-.main {
-    width: 68%;
-    display: flex;
-    justify-content: center;
-    padding: 40px 0;
-}
-
-.container {
-    width: 100%;
-    max-width: 900px;
-    background: var(--card);
-    border-radius: 18px;
-    padding: 32px;
-}
-
-/* SIDE PANEL */
-.side-content {
-    background: rgba(255,255,255,0.08);
-    padding: 18px;
-    border-radius: 12px;
-}
-
-.profile {
-    text-align: center;
-}
-
-.links a {
-    display: block;
-    margin: 6px 0;
-    color: white;
-    text-decoration: none;
-}
-
-.panel-title {
-    margin-top: 14px;
-    font-weight: bold;
-}
-
-.stats p {
-    margin: 5px 0;
 }
 
 /* MAIN */
+.main {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* PANELS */
+.panel {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(91,108,255,0.10);
+    border: 1px solid rgba(91,108,255,0.12);
+}
+
+body.dark .panel {
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.left-panel { width: 60%; }
+.right-panel { width: 40%; }
+
+/* TOP */
 .top {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.toggle {
-    background: transparent;
-    border: 2px solid var(--primary);
-    padding: 6px 10px;
-    border-radius: 8px;
+/* THEME TOGGLE */
+.toggle-switch {
+    width: 60px;
+    height: 28px;
+    background: var(--primary);
+    border-radius: 30px;
+    position: relative;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    box-sizing: border-box;
 }
 
-.instructions {
-    margin-top: 20px;
-    padding: 20px;
-    border-left: 4px solid var(--primary);
-    background: rgba(91,108,255,0.08);
-    border-radius: 10px;
+.theme-icon {
+    font-size: 13px;
+    line-height: 1;
+    z-index: 1;
+    pointer-events: none;
 }
 
-.instructions ul {
-    padding-left: 20px;
+.switch {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    transition: 0.3s;
+    z-index: 2;
 }
 
-.instructions li {
-    margin-bottom: 6px;
+body.dark .switch {
+    left: 32px;
 }
 
+/* INPUT */
 .input-section {
-    margin-top: 20px;
+    margin-top: 15px;
     display: flex;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 input {
-    flex: 1;
     padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+}
+
+#repoUrl {
+    flex: 1;
 }
 
 button {
     padding: 12px 18px;
+    border-radius: 12px;
     background: var(--primary);
     color: white;
     border: none;
     cursor: pointer;
 }
 
-/* RESULT */
+/* RESULT BOX */
 .result {
-    margin-top: 20px;
-    padding: 20px;
-    line-height: 1.8;
-}
-
-.result p {
-    margin: 12px 0;
-}
-
-.result li {
-    margin-bottom: 8px;
-}
-
-.spinner {
-    display: none;
-    text-align: center;
-}
-
-/* CHAT ONLY (ADDED) */
-.chat-box {
-    height: 260px;
+    margin-top: 15px;
+    flex: 1;
     overflow-y: auto;
-    margin-top: 10px;
+    padding: 15px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 16px;
+    min-height: 0;
+}
+
+/* DARK MODE FIX: boxes */
+body.dark .result,
+body.dark .chat-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* CHAT */
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 16px;
+    min-height: 0;
+}
+
+.message {
+    margin: 10px 0;
     padding: 10px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+}
+
+.user {
+    background: #22c55e;
+    color: white;
+    text-align: right;
+}
+
+.bot {
+    background: #334155;
+    color: white;
+}
+
+/* INSTRUCTIONS */
+.instructions {
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(91,108,255,0.08);
+    border-radius: 14px;
+    display: none;
+    overflow-y: auto;
+    max-height: 220px;
+    flex-shrink: 0;
+}
+
+.instructions h3 {
+    margin: 0 0 8px 0;
     font-size: 14px;
+    color: var(--primary);
+}
+
+.instructions ul {
+    margin: 6px 0;
+    padding-left: 20px;
+}
+
+.instructions li {
+    font-size: 13px;
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.instructions p {
+    margin: 8px 0 4px;
+    font-size: 13px;
+}
+
+.instructions hr {
+    border: none;
+    border-top: 1px solid rgba(91,108,255,0.2);
+    margin: 10px 0;
+}
+
+/* HIGHLIGHTED KEYWORDS */
+.hl {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+body.dark .hl {
+    color: #a5b4fc;
+}
+
+/* TOGGLE BUTTON */
+.toggle-btn {
+    margin-top: 10px;
+    cursor: pointer;
+    color: var(--primary);
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* MODE TOGGLE */
+.mode-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+    flex-shrink: 0;
+}
+
+.mode-toggle {
+    width: 220px;
+    height: 40px;
+    background: rgba(0,0,0,0.07);
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.09);
+    user-select: none;
+}
+
+body.dark .mode-toggle {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.1);
+}
+
+.slider {
+    position: absolute;
+    width: calc(50% - 4px);
+    height: calc(100% - 6px);
+    background: var(--primary);
+    border-radius: 24px;
+    left: 3px;
+    top: 3px;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 2px 10px rgba(91,108,255,0.35);
+    z-index: 0;
+}
+
+.mode-toggle.smart .slider {
+    left: calc(50% + 1px);
+}
+
+.mode-label {
+    position: relative;
+    z-index: 1;
+    width: 50%;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: color 0.25s;
+    color: var(--muted);
+}
+
+.mode-toggle:not(.smart) #labelStrict,
+.mode-toggle.smart #labelSmart {
+    color: #fff;
+}
+
+/* Right panel instructions box */
+.right-panel .instructions {
+    max-height: none;
+    flex-shrink: 0;
+}
+
+/* SPINNER */
+#spinner {
+    display: none;
+    margin-top: 10px;
+    flex-shrink: 0;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LEFT PANEL -->
-<div class="side">
-<div class="side-content">
-
-<div class="profile">
-<h3>👨‍💻 Hitesh Kumar</h3>
-<p>Backend Developer</p>
-</div>
-
-<div class="panel-title">🔗 Profiles</div>
-<div class="links">
-<a href="https://github.com/Hitesh-Kumar-S" target="_blank">💻 GitHub</a>
-<a href="https://www.linkedin.com/in/hitesh-kumar-s-579b922b0/" target="_blank">🔗 LinkedIn</a>
-<a href="https://leetcode.com/u/SHK_2006/" target="_blank">🧠 LeetCode</a>
-<a href="https://www.hackerrank.com/profile/hitesh_kumar_s" target="_blank">🏆 HackerRank</a>
-<a href="https://www.codechef.com/users/shk_2006" target="_blank">🍴 CodeChef</a>
-</div>
-
-<div class="stats">
-<div class="panel-title">📊 Stats</div>
-<p>💡 Projects: 3</p>
-<p>🔥 DSA Practice: Active</p>
-<p>⚡ Java • Spring Boot • AI</p>
-</div>
-
-</div>
-</div>
-
-<!-- MAIN -->
 <div class="main">
-<div class="container">
+
+<!-- LEFT -->
+<div class="panel left-panel">
 
 <div class="top">
-<h1>🚀 Project Analyzer</h1>
-<button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+    <h2>🚀 RepoMind AI</h2>
+    <div class="toggle-switch" onclick="toggleTheme()">
+        <span class="theme-icon">☀️</span>
+        <div class="switch"></div>
+        <span class="theme-icon">🌙</span>
+    </div>
 </div>
 
-<p>
-Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong> repositories and get interview-ready insights instantly.
+<!-- <p>
+    Analyze <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong> repositories instantly.
+</p> -->
+
+<p style="font-size: 14px; color: var(--muted); line-height: 1.6;">
+    Effortlessly analyze public repositories from <strong style="color: var(--text);">GitHub</strong>, 
+    <strong style="color: var(--text);">GitLab</strong>, and 
+    <strong style="color: var(--text);">Bitbucket</strong>. 
+    Gain instant insights into project structure, tech stack, and key features — powered by AI.
 </p>
 
-<!-- RULES (UNCHANGED) -->
-<div class="instructions">
+<div class="toggle-btn" onclick="toggleInstructions()">📘 Show Instructions</div>
 
-<h3>📌 General Guidelines</h3>
-<ul>
-<li>Make sure the repository is <strong>public</strong>.</li>
-<li>A <strong>README.md</strong> should be available in the <strong>root directory</strong>.</li>
-<li>The default branch is usually <strong>main</strong> or <strong>master</strong>.</li>
-<li>For best results, the README can include:
-<ul>
-<li><strong>Project overview</strong></li>
-<li><strong>Tech stack</strong></li>
-<li><strong>Architecture</strong></li>
-<li><strong>Features</strong></li>
-</ul>
-</li>
-</ul>
+<div id="instructions" class="instructions">
 
-<hr>
+    <h3>📌 General Guidelines</h3>
+    <ul>
+        <li>Make sure the repository is <span class="hl">public</span>.</li>
+        <li>A <span class="hl">README.md</span> should be available in the <span class="hl">root directory</span>.</li>
+        <li>The default branch is usually <span class="hl">main</span> or <span class="hl">master</span>.</li>
+        <li>For best results, include:
+            <ul>
+                <li><span class="hl">Project overview</span></li>
+                <li><span class="hl">Tech stack</span></li>
+                <li><span class="hl">Architecture</span></li>
+                <li><span class="hl">Features</span></li>
+            </ul>
+        </li>
+    </ul>
 
-<h3>🌐 Platform Tips</h3>
+    <hr>
 
-<p><strong>🐙 GitHub</strong></p>
-<ul>
-<li>https://github.com/username/repository</li>
-<li>README in root</li>
-<li>Branch: main or master</li>
-</ul>
+    <h3>🌐 Platform Tips</h3>
 
-<p><strong>🦊 GitLab</strong></p>
-<ul>
-<li>https://gitlab.com/username/repository</li>
-<li>Repository should be public</li>
-<li>README in root</li>
-<li>Branch: main or master</li>
-</ul>
+    <p><strong>🐙 GitHub</strong></p>
+    <ul>
+        <li><span class="hl">https://github.com/username/repository</span></li>
+        <li>README in <span class="hl">root</span></li>
+        <li>Branch: <span class="hl">main</span> or <span class="hl">master</span></li>
+    </ul>
 
-<p><strong>🪣 Bitbucket</strong></p>
-<ul>
-<li>https://bitbucket.org/workspace/repository</li>
-<li>Avoid /src/branch in URL</li>
-<li>README in root</li>
-<li>Branch: main or master</li>
-</ul>
+    <p><strong>🦊 GitLab</strong></p>
+    <ul>
+        <li><span class="hl">https://gitlab.com/username/repository</span></li>
+        <li>Repository should be <span class="hl">public</span></li>
+        <li>README in <span class="hl">root</span></li>
+        <li>Branch: <span class="hl">main</span> or <span class="hl">master</span></li>
+    </ul>
+
+    <p><strong>🪣 Bitbucket</strong></p>
+    <ul>
+        <li><span class="hl">https://bitbucket.org/workspace/repository</span></li>
+        <li>Avoid <span class="hl">/src/branch</span></li>
+        <li>README in <span class="hl">root</span></li>
+        <li>Branch: <span class="hl">main</span> or <span class="hl">master</span></li>
+    </ul>
 
 </div>
 
 <div class="input-section">
-<input id="repoUrl" placeholder="Enter repository URL">
-<button onclick="analyzeProject()">Analyze</button>
+    <input id="repoUrl" placeholder="Enter repository URL (GitHub / GitLab / Bitbucket)">
+    <button onclick="analyzeProject()">Analyze</button>
 </div>
 
-<div class="spinner" id="spinner">
-<p>Analyzing...</p>
-</div>
+<div id="spinner">⏳ Analyzing...</div>
 
 <div id="result" class="result"></div>
 
 </div>
+
+<!-- RIGHT -->
+<div class="panel right-panel">
+
+<h3>💬 RepoMind Copilot</h3>
+
+<div class="instructions" style="display:block;">
+    <!-- <p>👋 Ask anything about your project.</p>
+    <ul>
+        <li><span class="hl">Strict Mode</span> → Only <span class="hl">README</span>-based answers</li>
+        <li><span class="hl">Smart Mode</span> → General + advanced answers</li>
+        <li>Use <span class="hl">Smart</span> for deeper understanding</li>
+    </ul> -->
+
+    <p>👋 Ask anything about your project.</p>
+
+<ul>
+    <li>
+        <span class="hl">Strict Mode</span> → Use this when you want answers strictly from the 
+        <span class="hl">README</span>.
+        <br>👉 Best for: factual answers and project-specific details.
+    </li>
+
+    <li>
+        <span class="hl">Smart Mode</span> → Uses AI knowledge beyond README.
+        <br>👉 Best for: explanations, concepts, comparisons, and improvements.
+    </li>
+
+    <li>
+        💡 <strong>Example questions:</strong>
+        <ul>
+            <li>Strict → "What does the README say about the architecture?"</li>
+            <li>Smart → "Why is Spring Boot used here?"</li>
+            <li>Smart → "How can this project be improved?"</li>
+        </ul>
+    </li>
+
+    <li>
+        ⚠️ If your question is not in README, 
+        <span class="hl">Strict Mode may not answer it</span>.
+    </li>
+</ul>
+
+<p style="margin-top:10px; font-size:13px; color:var(--muted);">
+⚠️ <strong>Note:</strong> This is an AI-generated assistant. Responses may not always be fully accurate.
+Please verify important information before relying on it.
+</p>
 </div>
 
-<!-- RIGHT PANEL (ONLY THIS CHANGED) -->
-<div class="side">
-<div class="side-content">
-
-<div class="panel-title">💡 Tips</div>
-<p>✔ Use structured README</p>
-<p>✔ Include architecture</p>
-<p>✔ Add setup steps</p>
-
-<div class="panel-title">🚀 Features</div>
-<p>✅ GitHub</p>
-<p>✅ GitLab</p>
-<p>✅ Bitbucket</p>
-
-<div class="panel-title">🤖 Project Chatbot</div>
-
-<div id="chatBox" class="chat-box">
-<p style="opacity:0.7;">Ask questions about the analyzed project...</p>
+<div class="mode-toggle-wrapper">
+    <div class="mode-toggle" id="modeToggle" onclick="toggleMode()">
+        <div class="slider"></div>
+        <span class="mode-label" id="labelStrict">Strict</span>
+        <span class="mode-label" id="labelSmart">Smart</span>
+    </div>
 </div>
 
-<div style="display:flex; gap:6px; margin-top:10px;">
-<input id="chatInput" placeholder="Ask something..." style="flex:1; padding:8px; border-radius:8px; border:none;">
-<button onclick="sendMessage()">Send</button>
+<div id="chatBox" class="chat-box"></div>
+
+<div style="display:flex; gap:10px; margin-top:10px; flex-shrink:0;">
+    <input id="chatInput" placeholder="Ask something..." style="flex:1;">
+    <button onclick="sendMessage()">Send</button>
 </div>
 
 </div>
+
 </div>
 
 <script>
+let isSmart = false;
+
+function toggleMode() {
+    isSmart = !isSmart;
+    document.getElementById("modeToggle").classList.toggle("smart", isSmart);
+}
+
+function toggleInstructions() {
+    const box = document.getElementById("instructions");
+    const btn = document.querySelector(".toggle-btn");
+    const isVisible = box.style.display === "block";
+    box.style.display = isVisible ? "none" : "block";
+    btn.textContent = isVisible ? "📘 Show Instructions" : "📘 Hide Instructions";
+}
+
 function analyzeProject() {
     const repoUrl = document.getElementById("repoUrl").value;
     const result = document.getElementById("result");
@@ -322,33 +500,79 @@ function toggleTheme() {
     document.body.classList.toggle("dark");
 }
 
-/* CHAT FUNCTION (ADDED ONLY) */
+function addMessage(role, text) {
+    const chatBox = document.getElementById("chatBox");
+    const msg = document.createElement("div");
+    msg.classList.add("message", role);
+    msg.innerHTML = marked.parse(text);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
 function sendMessage() {
     const input = document.getElementById("chatInput");
-    const chatBox = document.getElementById("chatBox");
-
     const question = input.value.trim();
     if (!question) return;
 
-    chatBox.innerHTML += `<div><strong>You:</strong> ${question}</div>`;
-
+    addMessage("user", question);
     input.value = "";
 
-    chatBox.innerHTML += `<div id="typing">Typing...</div>`;
+    addMessage("bot", "Typing...");
 
     fetch("/chat", {
         method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: question
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            question: question,
+            strictMode: !isSmart
+        })
     })
     .then(res => res.text())
     .then(answer => {
-        document.getElementById("typing").remove();
-        chatBox.innerHTML += `<div><strong>Bot:</strong> ${marked.parse(answer)}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
+        document.getElementById("chatBox").lastChild.remove();
+        addMessage("bot", answer);
     });
 }
 </script>
+
+<div style="
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 30px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 10px;
+">
+    <!-- Left -->
+    <span style="flex: 1; text-align: left;">
+        Developed by: <strong style="color: var(--text);">Hitesh Kumar S</strong>
+    </span>
+
+    <!-- Center -->
+    <span style="flex: 1; text-align: center; font-size: 15px; font-weight: 500; color: var(--text);">
+        Connect with the Developer →
+        <a href="https://www.linkedin.com/in/hitesh-kumar-s-579b922b0/" target="_blank"
+           style="color: var(--primary); font-weight: 600; text-decoration: none; margin-left: 8px;">
+            💼 LinkedIn
+        </a>
+        <span style="margin: 0 6px;">|</span>
+        <a href="https://codolio.com/profile/Hitesh_Kumar_S" target="_blank"
+           style="color: var(--primary); font-weight: 600; text-decoration: none;">
+            👨‍💻 Codolio
+        </a>
+    </span>
+
+    <!-- Right -->
+    <span style="flex: 1; text-align: right;">
+        For any queries, mail at
+        <a href="mailto:hiteshkumarsrinivasan@gmail.com"
+           style="color: var(--primary); font-weight: 600; text-decoration: none;">
+            hiteshkumarsrinivasan@gmail.com
+        </a>
+    </span>
+</div>
 
 </body>
 </html>

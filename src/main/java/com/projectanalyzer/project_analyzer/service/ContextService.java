@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 public class ContextService {
 
     private String currentReadme;
+    private String repoStructure;
+    private String keyFiles;
+
+    // ===================== README =====================
 
     public void setReadme(String readme) {
         this.currentReadme = readme;
@@ -15,11 +19,48 @@ public class ContextService {
         return currentReadme;
     }
 
+    // ===================== REPO STRUCTURE =====================
+
+    public void setRepoStructure(String structure) {
+        this.repoStructure = structure;
+    }
+
+    public String getRepoStructure() {
+        return repoStructure;
+    }
+
+    public void setKeyFiles(String keyFiles) {
+        this.keyFiles = keyFiles;
+    }
+
+    // ===================== CONTEXT CHECK =====================
+
     public boolean hasContext() {
         return currentReadme != null && !currentReadme.isEmpty();
     }
 
     public void clear() {
         this.currentReadme = null;
+        this.repoStructure = null;
     }
+
+    // ===================== BUILD CONTEXT =====================
+
+    public String buildContext() {
+
+    String readme = currentReadme != null ? currentReadme : "No README available";
+    String structure = repoStructure != null ? repoStructure : "No structure available";
+    String files = keyFiles != null ? keyFiles : "No key files available";
+
+    return """
+PROJECT README:
+%s
+
+PROJECT STRUCTURE:
+%s
+
+IMPORTANT FILES:
+%s
+""".formatted(readme, structure, files);
+}
 }
